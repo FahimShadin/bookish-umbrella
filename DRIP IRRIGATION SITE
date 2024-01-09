@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irrigation System Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .status {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .yes-status {
+            color: green;
+        }
+
+        .no-status {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Irrigation System Status</h1>
+    <div class="status">
+        Rain: <span id="rain-status" class="yes-status">Yes</span> / <span class="no-status">No</span>
+    </div>
+    <div class="status">
+        Motor Active: <span id="motor-status" class="yes-status">Yes</span> / <span class="no-status">No</span>
+    </div>
+
+    <script>
+        // Fetch data from the server and update the webpage
+        async function fetchData() {
+            try {
+                // Fetch rain status
+                const rainResponse = await fetch('/getRainStatus'); // Replace with your server endpoint
+                const rainData = await rainResponse.json();
+                updateStatus('rain', rainData.rainStatus);
+
+                // Fetch motor status
+                const motorResponse = await fetch('/getMotorStatus'); // Replace with your server endpoint
+                const motorData = await motorResponse.json();
+                updateStatus('motor', motorData.motorStatus);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Update the rain or motor status on the webpage
+        function updateStatus(type, isYes) {
+            const statusElement = document.getElementById(`${type}-status`);
+            const yesStatusClass = isYes ? 'yes-status' : 'no-status';
+            const noStatusClass = isYes ? 'no-status' : 'yes-status';
+
+            statusElement.classList.add(yesStatusClass);
+            statusElement.classList.remove(noStatusClass);
+        }
+
+        // Fetch data on page load and set interval for periodic updates
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData();
+            setInterval(fetchData, 5000); // Update every 5 seconds, adjust as needed
+        });
+    </script>
+</body>
+
+</html>
